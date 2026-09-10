@@ -8,6 +8,8 @@ Repo: https://github.com/openclaw/acpx
 
 ### Changes
 
+- Agents/built-ins: add fx through its native `fx acp` server, forwarding `acpx --model` to the adapter's startup `--model` flag.
+
 ### Breaking
 
 ### Fixes
