@@ -8,6 +8,8 @@ Repo: https://github.com/openclaw/acpx
 
 ### Changes
 
+- Agents/built-ins: add Devin CLI through its native `devin acp` server, forwarding `acpx --model` to the adapter's startup `--model` flag while keeping the scoped Windsurf client-identity compatibility shim.
+
 ### Breaking
 
 ### Fixes
