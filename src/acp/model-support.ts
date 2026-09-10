@@ -161,13 +161,21 @@ export function modelStateFromConfigOptions(configOptions: unknown): SessionMode
     return undefined;
   }
 
+  // Adapters can advertise several model-category selects (fx exposes both a
+  // `provider` and a `model` selector). An explicit `id: "model"` identifies the
+  // actual model control; category-only matches remain the fallback.
+  let fallback: SessionModelState | undefined;
   for (const value of configOptions) {
     const models = parseModelConfigOption(value);
-    if (models) {
+    if (!models) {
+      continue;
+    }
+    if (models.configId === "model") {
       return models;
     }
+    fallback ??= models;
   }
-  return undefined;
+  return fallback;
 }
 
 export function modelStateFromLegacyResponse(response: unknown): SessionModelState | undefined {
