@@ -1460,6 +1460,42 @@ test("integration: Devin ACP launch advertises scoped Windsurf client info", asy
   });
 });
 
+test("integration: built-in devin agent resolves to devin acp", async () => {
+  await withTempHome(async (homeDir) => {
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), "acpx-integration-cwd-"));
+    const fakeBinDir = await fs.mkdtemp(path.join(os.tmpdir(), "acpx-fake-devin-"));
+
+    try {
+      await writeFakeDevinAgent(fakeBinDir);
+
+      const result = await runCli(
+        ["--approve-all", "--cwd", cwd, "--format", "json", "devin", "exec", "echo hello"],
+        homeDir,
+        {
+          env: {
+            PATH: `${fakeBinDir}${path.delimiter}${process.env.PATH ?? ""}`,
+          },
+        },
+      );
+      assert.equal(result.code, 0, result.stderr);
+
+      const payloads = parseJsonRpcOutputLines(result.stdout);
+      const initializeRequest = payloads.find((payload) => payload.method === "initialize") as
+        | {
+            params?: {
+              clientInfo?: { name?: unknown };
+            };
+          }
+        | undefined;
+      assert(initializeRequest, result.stdout);
+      assert.equal(initializeRequest.params?.clientInfo?.name, "windsurf");
+    } finally {
+      await fs.rm(fakeBinDir, { recursive: true, force: true });
+      await fs.rm(cwd, { recursive: true, force: true });
+    }
+  });
+});
+
 test("integration: exec --model sets the advertised model config option", async () => {
   await withTempHome(async (homeDir) => {
     const cwd = await fs.mkdtemp(path.join(os.tmpdir(), "acpx-integration-cwd-"));

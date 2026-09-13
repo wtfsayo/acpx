@@ -1,7 +1,7 @@
 # Devin
 
-- Built-in name: none
-- Raw command: `devin acp`
+- Built-in name: `devin`
+- Default command: `devin acp`
 - Upstream: https://www.devin.ai
 
 ## ACP compatibility contract
@@ -10,13 +10,19 @@ Devin requires Windsurf-compatible client metadata during ACP initialization. `a
 
 ### Detection
 
-`acpx` detects Devin ACP launches when the raw command starts with `devin` and includes `acp`, `--acp`, or `--experimental-acp`.
+`acpx` detects Devin ACP launches when the command starts with `devin` and includes `acp`, `--acp`, or `--experimental-acp`. The built-in `devin` shortcut resolves to `devin acp`, so the shim applies automatically:
+
+```bash
+acpx devin exec 'summarize this repo'
+```
+
+The raw command escape hatch works too:
 
 ```bash
 acpx --agent 'devin acp' exec 'summarize this repo'
 ```
 
-Pass Devin global flags such as `--model <model>` before `acp` when needed:
+`acpx --model <id>` applies through the advertised ACP model config option, like any other agent. To pin a Devin global flag instead, pass it before `acp` on a raw command:
 
 ```bash
 acpx --agent 'devin --model swe-1-6 acp' exec 'summarize this repo'
